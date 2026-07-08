@@ -1,0 +1,18 @@
+import { Card as CardType } from "../game/cards";
+import { Card } from "./Card";
+
+type StockProps = {
+  cards: CardType[];
+  onStockClicked?: () => void;
+};
+
+export function Stock({ cards, onStockClicked }: StockProps) {
+  return (
+    <div
+      className="h-40 w-28 rounded-md overflow-hidden"
+      onClick={() => onStockClicked?.()}
+    >
+      {cards.length > 0 ? <Card card={cards[cards.length - 1]}></Card> : ""}
+    </div>
+  );
+}

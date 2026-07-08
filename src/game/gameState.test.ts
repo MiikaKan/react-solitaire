@@ -44,6 +44,27 @@ describe('drawFromStock', () => {
         expect(nextState.stock).not.toBe(gameState.stock);
         expect(nextState.waste).not.toBe(gameState.waste);
         expect(gameState.stock[gameState.stock.length - 1]).toEqual(originalFirstStockCard);
+
+        nextState.stock.forEach(card => expect(card.faceUp).toBe(false));
+    });
+
+    it('recycles waste back into stock face down', () => {
+        let gameState = dealGame('test-seed');
+        const initialStockLength = gameState.stock.length;
+
+        for (let i = 0; i < initialStockLength; i++) {
+            gameState = drawFromStock(gameState);
+        }
+
+        expect(gameState.stock).toHaveLength(0);
+        expect(gameState.waste).toHaveLength(initialStockLength);
+        expect(gameState.waste.every((card) => card.faceUp)).toBe(true);
+
+        const recycledState = drawFromStock(gameState);
+
+        expect(recycledState.stock).toHaveLength(initialStockLength);
+        expect(recycledState.waste).toHaveLength(0);
+        expect(recycledState.stock.every((card) => !card.faceUp)).toBe(true);
     });
 });
 
