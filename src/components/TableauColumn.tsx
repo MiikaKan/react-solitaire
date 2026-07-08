@@ -1,5 +1,6 @@
 import { Card as CardType, getCardId } from "../game/cards";
 import { Card } from "./Card";
+import { EmptySlot } from "./EmptySlot";
 
 type TableauColumnProps = {
   cards: CardType[];
@@ -12,19 +13,25 @@ export function TableauColumn({
   columnIndex,
   onCardClick,
 }: TableauColumnProps) {
-  const cardComponents = cards.map((card, index) => (
-    <div
-      key={getCardId(card)}
-      className={index === 0 ? "relative" : "relative -mt-30"}
-    >
-      <Card
-        card={card}
-        onClick={
-          card.faceUp ? () => onCardClick?.(card, columnIndex) : undefined
-        }
-      />
-    </div>
-  ));
+  let content;
 
-  return <div>{cardComponents}</div>;
+  if (cards.length > 0) {
+    content = cards.map((card, index) => (
+      <div
+        key={getCardId(card)}
+        className={index === 0 ? "relative" : "relative -mt-30"}
+      >
+        <Card
+          card={card}
+          onClick={
+            card.faceUp ? () => onCardClick?.(card, columnIndex) : undefined
+          }
+        />
+      </div>
+    ));
+  } else {
+    content = <EmptySlot />;
+  }
+
+  return <div>{content}</div>;
 }

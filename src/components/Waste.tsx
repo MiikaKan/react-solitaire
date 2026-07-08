@@ -4,7 +4,7 @@ import { Card } from "./Card";
 type WasteProps = {
   cards: CardType[];
   wasteSize: number;
-  onWasteCardClicked?: (card: CardType) => void;
+  onWasteCardClicked?: () => void;
 };
 
 export function Waste({ cards, wasteSize, onWasteCardClicked }: WasteProps) {

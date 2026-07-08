@@ -1,5 +1,6 @@
 import { Card as CardType, Suit } from "../game/cards";
 import { Card } from "./Card";
+import { EmptySlot } from "./EmptySlot";
 
 type FoundationsProps = {
   foundations: Record<Suit, CardType[]>;
@@ -26,9 +27,9 @@ function Foundation({ foundation }: FoundationProps) {
 
   if (foundation.length > 0) {
     content = <Card card={foundation[foundation.length - 1]} />;
+  } else {
+    content = <EmptySlot />;
   }
 
-  return (
-    <div className="h-40 w-28 rounded-md border border-white"> {content}</div>
-  );
+  return content;
 }

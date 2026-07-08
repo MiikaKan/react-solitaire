@@ -235,3 +235,13 @@ export function canMoveToTableauColumn(
     isRedSuit(card) !== isRedSuit(topCard) && isOneRankLower(card, topCard)
   );
 }
+
+export function isGameWon(gameState: GameState): boolean {
+  const foundationsArray = Object.values(gameState.foundations);
+
+  if (foundationsArray.length < 4) return false;
+
+  return Object.values(gameState.foundations).every(
+    (foundation) => foundation && foundation.length === 13,
+  );
+}
