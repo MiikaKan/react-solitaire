@@ -4,9 +4,10 @@ import Image from "next/image";
 type CardProps = {
   card: CardType;
   onClick?: (card: CardType) => void;
+  selected: boolean;
 };
 
-export function Card({ card, onClick }: CardProps) {
+export function Card({ card, selected, onClick }: CardProps) {
   let content;
 
   if (card.faceUp) {
@@ -41,7 +42,7 @@ export function Card({ card, onClick }: CardProps) {
 
   return (
     <div
-      className="h-40 w-28 rounded-md overflow-hidden"
+      className={`h-40 w-28 rounded-md overflow-hidden ${selected ? "ring-4 ring-yellow-200" : ""}`}
       onClick={() => onClick?.(card)}
     >
       {content}

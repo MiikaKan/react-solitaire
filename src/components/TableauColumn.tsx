@@ -5,12 +5,14 @@ import { EmptySlot } from "./EmptySlot";
 type TableauColumnProps = {
   cards: CardType[];
   columnIndex: number;
+  selectedCardIndex: number | null;
   onCardClick?: (card: CardType, index: number) => void;
 };
 
 export function TableauColumn({
   cards,
   columnIndex,
+  selectedCardIndex,
   onCardClick,
 }: TableauColumnProps) {
   let content;
@@ -23,6 +25,7 @@ export function TableauColumn({
       >
         <Card
           card={card}
+          selected={selectedCardIndex === index}
           onClick={
             card.faceUp ? () => onCardClick?.(card, columnIndex) : undefined
           }

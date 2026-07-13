@@ -4,16 +4,23 @@ import { Card } from "./Card";
 type WasteProps = {
   cards: CardType[];
   wasteSize: number;
+  selectedCardIndex: number | null;
   onWasteCardClicked?: () => void;
 };
 
-export function Waste({ cards, wasteSize, onWasteCardClicked }: WasteProps) {
+export function Waste({
+  cards,
+  wasteSize,
+  selectedCardIndex,
+  onWasteCardClicked,
+}: WasteProps) {
   const visibleWaste = cards.slice(-wasteSize);
 
   const cardComponents = cards.slice(-wasteSize).map((card, index) => (
     <div key={getCardId(card)} className={index === 0 ? "" : "-ml-20"}>
       <Card
         card={card}
+        selected={selectedCardIndex !== null && selectedCardIndex === index}
         onClick={
           index === visibleWaste.length - 1 ? onWasteCardClicked : undefined
         }

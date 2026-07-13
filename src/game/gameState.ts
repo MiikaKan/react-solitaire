@@ -32,6 +32,10 @@ function copyState(state: GameState): GameState {
 }
 
 export function drawFromStock(gameState: GameState): GameState {
+  // Return same state if both stock and waste are empty.
+  if (gameState.stock.length === 0 && gameState.waste.length === 0)
+    return gameState;
+
   const newState = copyState(gameState);
 
   const card = drawCard(newState.stock);
@@ -43,7 +47,7 @@ export function drawFromStock(gameState: GameState): GameState {
     };
   }
 
-  // If stock is empty, recycle waste back into stock
+  // If stock is empty, recycle waste back into stock.
   return {
     ...newState,
     stock: [...newState.waste].reverse().map((wasteCard) => ({
@@ -244,4 +248,25 @@ export function isGameWon(gameState: GameState): boolean {
   return Object.values(gameState.foundations).every(
     (foundation) => foundation && foundation.length === 13,
   );
+}
+
+export function hasDifferentCardsInFoundation(
+  gameStateA: GameState,
+  gameStateB: GameState,
+): boolean {
+  const foundationsArray = Object.values(gameStateA.foundations);
+  const foundationsArrayB = Object.values(gameStateB.foundations);
+
+  let countA: number = 0;
+  let countB: number = 0;
+
+  for (const foundation of foundationsArray) {
+    for (const {} of foundation) countA++;
+  }
+
+  for (const foundation of foundationsArrayB) {
+    for (const {} of foundation) countA++;
+  }
+
+  return countA > countB;
 }
