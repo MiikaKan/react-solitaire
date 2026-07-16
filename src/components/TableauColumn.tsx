@@ -7,6 +7,7 @@ type TableauColumnProps = {
   columnIndex: number;
   selectedCardIndex: number | null;
   onCardClick?: (card: CardType, index: number) => void;
+  onEmptyTableauClick?: (index: number) => void;
 };
 
 export function TableauColumn({
@@ -14,6 +15,7 @@ export function TableauColumn({
   columnIndex,
   selectedCardIndex,
   onCardClick,
+  onEmptyTableauClick,
 }: TableauColumnProps) {
   let content;
 
@@ -36,5 +38,15 @@ export function TableauColumn({
     content = <EmptySlot />;
   }
 
-  return <div>{content}</div>;
+  return (
+    <div
+      onClick={
+        cards.length === 0
+          ? () => onEmptyTableauClick?.(columnIndex)
+          : undefined
+      }
+    >
+      {content}
+    </div>
+  );
 }

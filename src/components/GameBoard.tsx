@@ -4,26 +4,28 @@ import { useState } from "react";
 import { Card as CardType } from "../game/cards";
 import { dealGame } from "../game/deal";
 import {
-  autoMoveTableauCard,
-  autoMoveWasteCard,
   drawFromStock,
   GameState,
   isGameWon,
+  moveCardFromTableauToFoundation,
+  moveCardFromWasteToFoundation,
+  moveSelectedCardToTableauColumn,
+  WASTE_SIZE,
 } from "../game/gameState";
 import { Foundations } from "./Foundations";
 import { Stock } from "./Stock";
 import { TableauColumn } from "./TableauColumn";
 import { Waste } from "./Waste";
 
-type CardSelection = {
+type CardHighlight = {
   tableauColumnIndex: number | null;
   cardIndex: number;
 };
 
 export function GameBoard() {
-  const [gameState, setGameState] = useState(() => dealGame("test-seed-123"));
+  const [gameState, setGameState] = useState(() => dealGame("test-seed-1234"));
   const [stateHistory, setStateHistory] = useState(() => [gameState]);
-  const [selectedCard, setSelectedCard] = useState<CardSelection | null>(
+  const [selectedCard, setSelectedCard] = useState<CardHighlight | null>(
     () => null,
   );
 
@@ -40,6 +42,7 @@ export function GameBoard() {
               : null
           }
           onCardClick={onTableauCardClicked}
+          onEmptyTableauClick={onEmptyTableauClicked}
         />
       ))}
     </div>
@@ -53,7 +56,7 @@ export function GameBoard() {
         <Stock cards={gameState.stock} onStockClicked={onStockClicked} />
         <Waste
           cards={gameState.waste}
-          wasteSize={3}
+          wasteSize={WASTE_SIZE}
           selectedCardIndex={
             selectedCard && selectedCard.tableauColumnIndex === null
               ? selectedCard.cardIndex
@@ -106,39 +109,124 @@ export function GameBoard() {
   function onTableauCardClicked(card: CardType, columnIndex: number): void {
     if (gameState.tableau.length <= columnIndex || columnIndex < 0) return;
 
-    const nextState = autoMoveTableauCard(gameState, card, columnIndex);
-
-    const cardSelection: CardSelection = {
+    const cardSelection: CardHighlight = {
       tableauColumnIndex: columnIndex,
       cardIndex: gameState.tableau[columnIndex].indexOf(card),
     };
 
-    if (cardSelection == selectedCard) {
+    if (selectedCard && isSameCardHighlight(cardSelection, selectedCard)) {
+      setSelectedCard(null);
+      return;
+    }
+
+    if (selectedCard) {
+      const selectedCardInstance = getSelectedCard();
+
+      if (selectedCardInstance) {
+        const nextState = moveSelectedCardToTableauColumn(
+          gameState,
+          selectedCardInstance,
+          selectedCard.tableauColumnIndex,
+          columnIndex,
+        );
+
+        setSelectedCard(null);
+
+        if (nextState !== null && nextState !== gameState) {
+          addStateToHistory(gameState);
+          setGameState(nextState);
+        }
+      }
+    } else {
+      const foundationMoveState = moveCardFromTableauToFoundation(
+        gameState,
+        card,
+        columnIndex,
+      );
+
+      if (foundationMoveState !== gameState) {
+        setSelectedCard(null);
+        setGameState(foundationMoveState);
+        return;
+      }
+
+      const cardSelection: CardHighlight = {
+        tableauColumnIndex: columnIndex,
+        cardIndex: gameState.tableau[columnIndex].indexOf(card),
+      };
+
+      setSelectedCard(cardSelection);
+    }
+  }
+
+  function onEmptyTableauClicked(columnIndex: number): void {
+    if (selectedCard) {
+      const selectedCardInstance = getSelectedCard();
+
+      if (selectedCardInstance) {
+        const nextState = moveSelectedCardToTableauColumn(
+          gameState,
+          selectedCardInstance,
+          selectedCard.tableauColumnIndex,
+          columnIndex,
+        );
+
+        setSelectedCard(null);
+
+        if (nextState !== null && nextState !== gameState) {
+          addStateToHistory(gameState);
+          setGameState(nextState);
+        }
+      }
+    }
+  }
+
+  function getSelectedCard(): CardType | null {
+    if (!selectedCard) return null;
+
+    if (selectedCard.tableauColumnIndex !== null) {
+      return gameState.tableau[selectedCard.tableauColumnIndex][
+        selectedCard.cardIndex
+      ];
+    }
+
+    return gameState.waste[gameState.waste.length - 1];
+  }
+
+  function onWasteCardClicked(): void {
+    const cardIndex =
+      gameState.waste.length - 1 > getWasteSize() - 1
+        ? WASTE_SIZE - 1
+        : gameState.waste.length - 1;
+
+    const cardSelection: CardHighlight = {
+      tableauColumnIndex: null,
+      cardIndex: cardIndex,
+    };
+
+    const foundationMoveState = moveCardFromWasteToFoundation(gameState);
+
+    if (foundationMoveState !== gameState) {
+      setSelectedCard(null);
+      setGameState(foundationMoveState);
+      return;
+    }
+
+    if (selectedCard && isSameCardHighlight(cardSelection, selectedCard)) {
       setSelectedCard(null);
     } else {
       setSelectedCard(cardSelection);
     }
-
-    if (nextState !== gameState) {
-      addStateToHistory(gameState);
-      setGameState(nextState);
-    }
   }
 
-  function onWasteCardClicked(): void {
-    const nextState = autoMoveWasteCard(gameState);
-
-    const cardSelection: CardSelection = {
-      tableauColumnIndex: null,
-      cardIndex: gameState.waste.length - 1,
-    };
-
-    setSelectedCard(cardSelection);
-
-    if (nextState !== gameState) {
-      addStateToHistory(gameState);
-      setGameState(nextState);
-    }
+  function isSameCardHighlight(
+    cardHighlightA: CardHighlight,
+    cardHighlightB: CardHighlight,
+  ): boolean {
+    return (
+      cardHighlightA.cardIndex === cardHighlightB.cardIndex &&
+      cardHighlightA.tableauColumnIndex === cardHighlightB.tableauColumnIndex
+    );
   }
 
   function addStateToHistory(state: GameState) {

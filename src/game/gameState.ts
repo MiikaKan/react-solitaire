@@ -16,6 +16,8 @@ export type GameState = {
   foundations: Record<Suit, Card[]>;
 };
 
+export const WASTE_SIZE: number = 3;
+
 function copyState(state: GameState): GameState {
   return {
     stock: [...state.stock],
@@ -74,6 +76,52 @@ export function autoMoveTableauCard(
   }
 
   return moveCardFromTableauToTableau(gameState, card, sourceColumnIndex);
+}
+
+export function moveSelectedCardToTableauColumn(
+  gameState: GameState,
+  card: Card,
+  fromColumnIndex: number | null,
+  targetColumnIndex: number,
+) {
+  const newState = copyState(gameState);
+
+  const targetColumn: Card[] = newState.tableau[targetColumnIndex];
+
+  if (!targetColumn || !canMoveToTableauColumn(card, targetColumn))
+    return gameState;
+
+  // from tableau to tableau
+  if (fromColumnIndex !== null) {
+    const sourceColumn = newState.tableau[fromColumnIndex];
+
+    if (!sourceColumn) return gameState;
+
+    const cardIndex = sourceColumn.indexOf(card);
+
+    const cardsToMove: Card[] = sourceColumn.slice(cardIndex);
+
+    for (const c of cardsToMove) {
+      targetColumn.push(c);
+      sourceColumn.splice(sourceColumn.indexOf(c), 1);
+    }
+
+    // flip the exposed card.
+    const exposedCard = sourceColumn[sourceColumn.length - 1];
+
+    if (exposedCard) {
+      sourceColumn[sourceColumn.length - 1] = {
+        ...exposedCard,
+        faceUp: true,
+      };
+    }
+  }
+  // moving from waste to tableau
+  else {
+    targetColumn.push(newState.waste.pop()!);
+  }
+
+  return { ...newState };
 }
 
 export function autoMoveWasteCard(gameState: GameState): GameState {
@@ -248,25 +296,4 @@ export function isGameWon(gameState: GameState): boolean {
   return Object.values(gameState.foundations).every(
     (foundation) => foundation && foundation.length === 13,
   );
-}
-
-export function hasDifferentCardsInFoundation(
-  gameStateA: GameState,
-  gameStateB: GameState,
-): boolean {
-  const foundationsArray = Object.values(gameStateA.foundations);
-  const foundationsArrayB = Object.values(gameStateB.foundations);
-
-  let countA: number = 0;
-  let countB: number = 0;
-
-  for (const foundation of foundationsArray) {
-    for (const {} of foundation) countA++;
-  }
-
-  for (const foundation of foundationsArrayB) {
-    for (const {} of foundation) countA++;
-  }
-
-  return countA > countB;
 }

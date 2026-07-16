@@ -4,10 +4,10 @@ import Image from "next/image";
 type CardProps = {
   card: CardType;
   onClick?: (card: CardType) => void;
-  selected: boolean;
+  selected?: boolean;
 };
 
-export function Card({ card, selected, onClick }: CardProps) {
+export function Card({ card, selected = false, onClick }: CardProps) {
   let content;
 
   if (card.faceUp) {
@@ -26,6 +26,7 @@ export function Card({ card, selected, onClick }: CardProps) {
           <Image
             src={getCardImagePath(card)}
             alt={getCardId(card)}
+            loading="eager"
             width={16}
             height={16}
           />
