@@ -195,7 +195,7 @@ export function GameBoard() {
 
   function onWasteCardClicked(): void {
     const cardIndex =
-      gameState.waste.length - 1 > getWasteSize() - 1
+      gameState.waste.length - 1 > WASTE_SIZE - 1
         ? WASTE_SIZE - 1
         : gameState.waste.length - 1;
 
