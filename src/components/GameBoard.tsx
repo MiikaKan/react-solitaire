@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Card as CardType } from "../game/cards";
 import { dealGame } from "../game/deal";
 import {
@@ -16,6 +16,7 @@ import { Foundations } from "./Foundations";
 import { Stock } from "./Stock";
 import { TableauColumn } from "./TableauColumn";
 import { Waste } from "./Waste";
+import { loadGame, saveGame } from "../game/persistence";
 
 type CardHighlight = {
   tableauColumnIndex: number | null;
@@ -23,11 +24,36 @@ type CardHighlight = {
 };
 
 export function GameBoard() {
-  const [gameState, setGameState] = useState(() => dealGame("test-seed-1234"));
+  const seed = useRef("test-seed-1234");
+  const checkedLocalStorage = useRef(false);
+
+  const [gameState, setGameState] = useState(() => dealGame(seed.current));
+  const [actionCount, setActionCount] = useState(() => 0);
   const [stateHistory, setStateHistory] = useState(() => [gameState]);
   const [selectedCard, setSelectedCard] = useState<CardHighlight | null>(
     () => null,
   );
+
+  useEffect(() => {
+    if (checkedLocalStorage.current)
+      saveGame(seed.current, gameState, stateHistory, actionCount);
+  }, [seed, gameState, stateHistory, actionCount]);
+
+  useLayoutEffect(() => {
+    if (checkedLocalStorage.current) return;
+
+    const load = loadGame();
+
+    if (load !== null) {
+      seed.current = load.seed;
+      setGameState(load.currentState);
+      setStateHistory(load.stateHistory);
+      setActionCount(load.actionCount);
+      setSelectedCard(null);
+    }
+
+    checkedLocalStorage.current = true;
+  });
 
   const tableau = (
     <div className="flex flex-row space-x-2">
@@ -70,14 +96,17 @@ export function GameBoard() {
       </div>
       {tableau}
 
-      {stateHistory.length > 1 && (
-        <div
-          className="bg-blue-800 w-fit pt-1 pb-1 pl-3 pr-3 text-white rounded-md hover:bg-blue-500"
-          onClick={onUndoClicked}
-        >
-          Undo
-        </div>
-      )}
+      <div className="flex flex-row gap-2">
+        {stateHistory.length > 1 && (
+          <div
+            className="bg-blue-800 w-fit pt-1 pb-1 pl-3 pr-3 text-white rounded-md hover:bg-blue-500"
+            onClick={onUndoClicked}
+          >
+            Undo
+          </div>
+        )}
+        <div>{actionCount} action(s) performed.</div>
+      </div>
 
       {gameWon && (
         <div className="absolute inset-0 z-50 flex items-center justify-center rounded-md bg-black/60">
@@ -103,6 +132,8 @@ export function GameBoard() {
     if (nextState !== gameState) {
       addStateToHistory(gameState);
       setGameState(nextState);
+
+      setActionCount(actionCount + 1);
     }
   }
 
@@ -135,6 +166,8 @@ export function GameBoard() {
         if (nextState !== null && nextState !== gameState) {
           addStateToHistory(gameState);
           setGameState(nextState);
+
+          setActionCount(actionCount + 1);
         }
       }
     } else {
@@ -146,7 +179,10 @@ export function GameBoard() {
 
       if (foundationMoveState !== gameState) {
         setSelectedCard(null);
+        addStateToHistory(gameState);
         setGameState(foundationMoveState);
+        setActionCount(actionCount + 1);
+
         return;
       }
 
@@ -176,6 +212,7 @@ export function GameBoard() {
         if (nextState !== null && nextState !== gameState) {
           addStateToHistory(gameState);
           setGameState(nextState);
+          setActionCount(actionCount + 1);
         }
       }
     }
@@ -208,7 +245,10 @@ export function GameBoard() {
 
     if (foundationMoveState !== gameState) {
       setSelectedCard(null);
+      addStateToHistory(gameState);
       setGameState(foundationMoveState);
+      setActionCount(actionCount + 1);
+
       return;
     }
 

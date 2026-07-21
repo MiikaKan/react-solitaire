@@ -1,9 +1,9 @@
-import { GameBoard } from "@/src/components/GameBoard";
+import { DynamicGameBoard } from "@/src/components/DynamicGameBoard";
 
 export default function Home() {
   return (
     <div>
-      <GameBoard />
+      <DynamicGameBoard />
     </div>
   );
 }
