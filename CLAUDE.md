@@ -20,6 +20,8 @@ There is no separate typecheck script; `tsc` runs implicitly via `next build` (`
 
 This is a Klondike Solitaire game built with Next.js (App Router) + React 19 + TypeScript + Tailwind CSS v4.
 
+The point of this project is to eventually have a "daily" solitaire game availble on the web, similar to the squaredle/wordle games.
+
 The codebase is split into two layers with a strict one-way dependency: **game logic never imports from components.**
 
 ### Game logic (`src/game/`)
