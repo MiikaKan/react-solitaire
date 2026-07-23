@@ -24,10 +24,10 @@ type CardHighlight = {
 };
 
 export function GameBoard() {
-  const seed = useRef("test-seed-1234");
   const checkedLocalStorage = useRef(false);
 
-  const [gameState, setGameState] = useState(() => dealGame(seed.current));
+  const [seed, setSeed] = useState(() => "test-seed-1234");
+  const [gameState, setGameState] = useState(() => dealGame(seed));
   const [actionCount, setActionCount] = useState(() => 0);
   const [stateHistory, setStateHistory] = useState(() => [gameState]);
   const [selectedCard, setSelectedCard] = useState<CardHighlight | null>(
@@ -36,7 +36,7 @@ export function GameBoard() {
 
   useEffect(() => {
     if (checkedLocalStorage.current)
-      saveGame(seed.current, gameState, stateHistory, actionCount);
+      saveGame(seed, gameState, stateHistory, actionCount);
   }, [seed, gameState, stateHistory, actionCount]);
 
   useLayoutEffect(() => {
@@ -45,7 +45,9 @@ export function GameBoard() {
     const load = loadGame();
 
     if (load !== null) {
-      seed.current = load.seed;
+      // Deferred to an effect intentionally: loadGame() needs localStorage, unavailable during SSR, so hydrating earlier would cause a mismatch.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSeed(load.seed);
       setGameState(load.currentState);
       setStateHistory(load.stateHistory);
       setActionCount(load.actionCount);
@@ -53,7 +55,7 @@ export function GameBoard() {
     }
 
     checkedLocalStorage.current = true;
-  });
+  }, []);
 
   const tableau = (
     <div className="flex flex-row space-x-2">
