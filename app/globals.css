@@ -3,6 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --card-w: clamp(2.5rem, calc((100cqw - 48px) / 7), 7rem);
+  --card-h: calc(var(--card-w) * 10 / 7);
 }
 
 @theme inline {

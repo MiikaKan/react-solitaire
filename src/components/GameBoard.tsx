@@ -58,7 +58,7 @@ export function GameBoard() {
   }, []);
 
   const tableau = (
-    <div className="flex flex-row space-x-2">
+    <div className="flex flex-row gap-1 sm:gap-2">
       {gameState.tableau.map((column, index) => (
         <TableauColumn
           key={`tableau-${index}`}
@@ -79,8 +79,8 @@ export function GameBoard() {
   const gameWon = isGameWon(gameState);
 
   return (
-    <div className="min-h-screen w-full space-y-5 p-6 max-w-220">
-      <div className="flex flex-row items-start gap-5">
+    <div className="min-h-screen w-full space-y-3 sm:space-y-5 p-2 sm:p-4 md:p-6 max-w-220 mx-auto overflow-x-auto [container-type:inline-size]">
+      <div className="flex flex-row items-start gap-2 sm:gap-4 md:gap-5">
         <Stock cards={gameState.stock} onStockClicked={onStockClicked} />
         <Waste
           cards={gameState.waste}
@@ -112,7 +112,9 @@ export function GameBoard() {
 
       {gameWon && (
         <div className="absolute inset-0 z-50 flex items-center justify-center rounded-md bg-black/60">
-          <div className="text-6xl font-bold text-white">You win!</div>
+          <div className="text-3xl sm:text-5xl md:text-6xl font-bold text-white">
+            You win!
+          </div>
         </div>
       )}
     </div>

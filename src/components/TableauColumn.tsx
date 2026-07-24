@@ -23,7 +23,11 @@ export function TableauColumn({
     content = cards.map((card, index) => (
       <div
         key={getCardId(card)}
-        className={index === 0 ? "relative" : "relative -mt-30"}
+        className={
+          index === 0
+            ? "relative"
+            : "relative mt-[calc(var(--card-h)*-0.75)]"
+        }
       >
         <Card
           card={card}

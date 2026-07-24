@@ -9,7 +9,7 @@ type StockProps = {
 export function Stock({ cards, onStockClicked }: StockProps) {
   return (
     <div
-      className="h-40 w-28 rounded-md overflow-hidden"
+      className="h-[var(--card-h)] w-[var(--card-w)] rounded-md overflow-hidden"
       onClick={() => onStockClicked?.()}
     >
       {cards.length > 0 ? <Card card={cards[cards.length - 1]}></Card> : ""}

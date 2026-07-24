@@ -17,7 +17,10 @@ export function Waste({
   const visibleWaste = cards.slice(-wasteSize);
 
   const cardComponents = cards.slice(-wasteSize).map((card, index) => (
-    <div key={getCardId(card)} className={index === 0 ? "" : "-ml-20"}>
+    <div
+      key={getCardId(card)}
+      className={index === 0 ? "" : "ml-[calc(var(--card-w)*-0.7143)]"}
+    >
       <Card
         card={card}
         selected={selectedCardIndex !== null && selectedCardIndex === index}
