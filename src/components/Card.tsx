@@ -1,42 +1,29 @@
-import { Card as CardType, getCardId, isRedSuit } from "../game/cards";
-import Image from "next/image";
+import { Card as CardType } from "../game/cards";
+import { SingleCornerCardFace } from "./SingleCornerCardFace";
+import { DoubleCornerCardFace } from "./DoubleCornerCardFace";
 
 type CardProps = {
   card: CardType;
   onClick?: (card: CardType) => void;
   selected?: boolean;
+  faceLayout?: "single" | "double";
 };
 
-export function Card({ card, selected = false, onClick }: CardProps) {
+export function Card({
+  card,
+  selected = false,
+  onClick,
+  faceLayout = "double",
+}: CardProps) {
   let content;
 
   if (card.faceUp) {
-    content = (
-      <div className="w-full h-full bg-white p-[8%] rounded-md border border-black/80">
-        <div className="w-full h-full border border-black p-[4%] text-[calc(var(--card-w)*0.2)] leading-none">
-          <div className="flex flex-row gap-1">
-            <span
-              className={
-                isRedSuit(card)
-                  ? "text-red-600 font-bold"
-                  : "text-black font-bold "
-              }
-            >
-              {card.rank}
-            </span>
-            <div className="relative w-[1em] h-[1em]">
-              <Image
-                src={getCardImagePath(card)}
-                alt={getCardId(card)}
-                loading="eager"
-                className="object-contain"
-                fill
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    content =
+      faceLayout === "double" ? (
+        <DoubleCornerCardFace card={card} />
+      ) : (
+        <SingleCornerCardFace card={card} />
+      );
   } else {
     content = (
       <div className="h-full w-full bg-blue-800 p-[6%] rounded-md border border-white/40">
@@ -53,8 +40,4 @@ export function Card({ card, selected = false, onClick }: CardProps) {
       {content}
     </div>
   );
-}
-
-function getCardImagePath(card: CardType): string {
-  return `/cards/${card.suit.toLowerCase()}.png`;
 }
