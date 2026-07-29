@@ -79,7 +79,7 @@ export function GameBoard() {
   const gameWon = isGameWon(gameState);
 
   return (
-    <div className="min-h-screen w-full space-y-3 sm:space-y-5 p-2 sm:p-4 md:p-6 max-w-220 mx-auto overflow-x-auto [container-type:inline-size]">
+    <div className="h-full w-full space-y-3 sm:space-y-5 p-2 sm:p-4 md:p-6 max-w-220 mx-auto overflow-x-auto @container">
       <div className="flex flex-row items-start gap-2 sm:gap-4 md:gap-5">
         <Stock cards={gameState.stock} onStockClicked={onStockClicked} />
         <Waste
