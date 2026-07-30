@@ -34,7 +34,7 @@ export function Card({
 
   return (
     <div
-      className={`h-[var(--card-h)] w-[var(--card-w)] rounded-md overflow-hidden ${selected ? "ring-4 ring-yellow-200" : ""}`}
+      className={`h-(--card-h) w-(--card-w) rounded-md overflow-hidden ${selected ? "ring-4 ring-yellow-200" : ""}`}
       onClick={() => onClick?.(card)}
     >
       {content}
